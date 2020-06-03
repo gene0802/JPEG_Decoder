@@ -11,66 +11,66 @@
 using namespace std;
 
 class Channel{
-    unsigned char id;
-    unsigned char sampleRate;
-    unsigned char DQT_ID;
-    unsigned char DQTid;
+    public:
+        unsigned char id;
+        unsigned char sRateH;
+        unsigned char sRateV;
+        unsigned char DQT_ID;
 };
 class Block{
-   unsigned char v[8][8]; 
+    public:
+        unsigned char v[8][8]; 
+};
+class Qtable{
+    public:
+        unsigned char id;
+        unsigned char size;
+        int v[8][8];
 };
 class Data{
-    int height;
-    int width;
-    Channel Y,Cb,Cr;
-    vector < map<int,int> >Huffman; //exact 4  DC,AC 0 1
-    vector <vector <vector <int> > > QTable; //at most 4
-    vector <Block> Y;
-    vector <Block> Cb;
-    vector <Block> Cr;
-};
-class SOF{
-
     public:
         int height;
         int width;
-        struct Channel{
-            unsigned char id;
-            unsigned char sampleRate;
-            unsigned char DQTid;
-            Channel (){};
-            Channel(char a,char b, char c):id(a),sampleRate(b),DQTid(c){};
-        }Y,Cb,Cr;
-        SOF (){};
-        SOF (string s):height( (unsigned char)s[2]<<8 |(unsigned char) s[3] ),width((unsigned char)s[4]<<8 |(unsigned char)s[5]),Y(s[7],s[8],s[9]),Cb(s[10],s[11],s[12]),Cr(s[13],s[14],s[15]){};
-};
+        Channel Y_inform,Cb_inform,Cr_inform;
+        vector < map<int,int> >Huffman; //exact 4  DC,AC 0 1
+        vector < Qtable > qTables; //at most 4
+        vector <Block> Y;
+        vector <Block> Cb;
+        vector <Block> Cr;
 
-class DQT{
+        void printData(const char *outFile){
+            FILE *ofp = fopen(outFile,"w");
+            
+            fprintf(ofp,"height: %d\n",height);
+            fprintf(ofp,"width: %d\n",width);
 
-    public:
-        int DQT_length;
-        char DQT_head;
-        vector <string> QT;
-};
+            fprintf(ofp,"Y channel: \n");
+            fprintf(ofp,"\tid:  %u\n",    Y_inform.id);
+            fprintf(ofp,"\tsRateH:  %u\n", Y_inform.sRateH);
+            fprintf(ofp,"\tsRateV:  %u\n", Y_inform.sRateV);
+            fprintf(ofp,"\tDQT_ID:  %u\n",Y_inform.DQT_ID);
+            fprintf(ofp,"Cb channel: \n");
+            fprintf(ofp,"\tid:  %u\n",    Cb_inform.id);
+            fprintf(ofp,"\tsRateH:  %u\n", Cb_inform.sRateH);
+            fprintf(ofp,"\tsRateV:  %u\n", Cb_inform.sRateV);
+            fprintf(ofp,"\tDQT_ID:  %u\n",Cb_inform.DQT_ID);
+            fprintf(ofp,"Cr channel: \n");
+            fprintf(ofp,"\tid:  %u\n",    Cr_inform.id);
+            fprintf(ofp,"\tsRateH:  %u\n", Cr_inform.sRateH);
+            fprintf(ofp,"\tsRateV:  %u\n", Cr_inform.sRateV);
+            fprintf(ofp,"\tDQT_ID:  %u\n",Cr_inform.DQT_ID);
 
-class DHT{
-
-    public:
-        int DHT_length;
-        char DHT_head;
-        vector <string> HT;
-};
-
-class SOS{
-
-    public:
-        struct Channel{
-            char id;
-            char DQTid;
-            Channel (){};
-            Channel(char a,char b):id(a),DQTid(b){};
-        }Y,Cb,Cr;
-        string data;
-        
-};
-           
+            for (int i=0;i<qTables.size();i++){
+                fprintf(ofp,"QTable %u: \n",qTables[i].id);
+                fprintf(ofp,"\t size %u: \n",qTables[i].size);
+                for(int j=0;j<8;j++){
+                        fprintf(ofp,"\t");
+                    for(int k=0;k<8;k++){
+                        fprintf(ofp,"%3d ",qTables[i].v[j][k]);
+                    }
+                        fprintf(ofp,"\n");
+                }
+            }
+            fclose(ofp);
+        }
+};    

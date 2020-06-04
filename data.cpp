@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <math.h>
 #include <map>
+#include <bitset>
 using namespace std;
 
 class Channel{
@@ -32,7 +33,7 @@ class Data{
         int height;
         int width;
         Channel Y_inform,Cb_inform,Cr_inform;
-        vector < map<int,int> >Huffman; //exact 4  DC,AC 0 1
+        map<int,int> Huffman[2][2]; //exact 4  DC:00,01  AC:10,11 // map code to word
         vector < Qtable > qTables; //at most 4
         vector <Block> Y;
         vector <Block> Cb;
@@ -61,8 +62,8 @@ class Data{
             fprintf(ofp,"\tDQT_ID:  %u\n",Cr_inform.DQT_ID);
 
             for (int i=0;i<qTables.size();i++){
-                fprintf(ofp,"QTable %u: \n",qTables[i].id);
-                fprintf(ofp,"\t size %u: \n",qTables[i].size);
+                fprintf(ofp,"QTable %u \n",qTables[i].id);
+                fprintf(ofp,"\t size :%u \n",qTables[i].size);
                 for(int j=0;j<8;j++){
                         fprintf(ofp,"\t");
                     for(int k=0;k<8;k++){
@@ -71,6 +72,14 @@ class Data{
                         fprintf(ofp,"\n");
                 }
             }
+            for(int i=0;i<2;i++){
+                for(int j=0;j<2;j++){
+                    fprintf(ofp,"Huffman %d,%d\n ",i,j);
+                    for(auto it = Huffman[i][j].cbegin(); it != Huffman[i][j].cend(); ++it)
+                        fprintf(ofp,"\t%04x => %4d\n",it->first,it->second);
+                }
+            }
+            
             fclose(ofp);
         }
 };    

@@ -19,7 +19,7 @@ class Parser{
         Parser(Data *d){
             data = d;
         }
-        bool parseSOF(const string &s){
+        void parseSOF(const string &s){
             data-> height = (unsigned char)s[2]<<8 |(unsigned char) s[3];
             data-> width  = (unsigned char)s[4]<<8 |(unsigned char) s[5];
             
@@ -37,34 +37,85 @@ class Parser{
             data-> Cr_inform.sRateH =(unsigned char)s[14]>>4;
             data-> Cr_inform.sRateV =(unsigned char)s[14]%16;
             data-> Cr_inform.DQT_ID = s[15];
-            return true;
+            return ;
         }
-        bool parseDQT(const vector <string> & sVec){
-            for(int i=0;i<sVec.size();i++)
-            {
-                Qtable qT;
-                qT.size = (unsigned char)sVec[i][1] >>4;
-                qT.id = (unsigned char)sVec[i][1] %16;
+        void parseDQT(const vector <string> & sV){
+            vector <string> sVec = sV;
 
-                if (qT.size==0){
-                    for(int j=0;j<8;j++)
-                        for (int k=0;k<8;k++)
-                        qT.v[j][k] = sVec[i][1+j*8+k];
-                }else{
-                    for(int j=0;j<8;j++)
-                        for (int k=0;k<8;k++)
-                        qT.v[j][k] = (unsigned int)sVec[i][1+(j*8+k)*2] <<4 + (unsigned int)sVec[i][1+(j*8+k)*2+1];
+            for(int i=0;i<sVec.size();i++)
+            {   
+                int remainLen = (unsigned char)sVec[i][0]-2;
+                sVec[i] = sVec[i].substr(1);
+
+                while(remainLen >0){
+                    int lenCount=0;
+                    Qtable qT;
+                    qT.size = (unsigned char)sVec[i][0] >>4;
+                    qT.id = (unsigned char)sVec[i][0] %16;
+                    lenCount++;
+
+                    if (qT.size==0){
+                        for(int j=0;j<8;j++)
+                            for (int k=0;k<8;k++){
+                                qT.v[j][k] = sVec[i][1+j*8+k];
+                                lenCount++;
+                            }
+                    }else{
+                        for(int j=0;j<8;j++)
+                            for (int k=0;k<8;k++){
+                                qT.v[j][k] = (unsigned int)sVec[i][1+(j*8+k)*2] <<4 + (unsigned int)sVec[i][1+(j*8+k)*2+1];
+                                lenCount+=2;
+                            }
+                    }
+                    data->qTables.push_back(qT);
+
+                    sVec[i] = sVec[i].substr(lenCount);
+                    remainLen -= lenCount;
                 }
-                data->qTables.push_back(qT);
             }
             
-            return true;
+            return ;
         }
-        bool parseDHT(const vector <string> & sVec){
-            return true;
+        void parseDHT(const vector <string> & sV){
+            vector <string> sVec = sV;
+            
+            for(int i=0;i<sVec.size();i++)
+            {   
+                //cout << (( (unsigned char) sVec[i][0])<<8) <<","<<(int)(unsigned char)sVec[i][1]<<endl;
+                int remainLen = (int)(((unsigned char)sVec[i][0])<<8) + (int)((unsigned char)sVec[i][1])-2;
+                sVec[i] = sVec[i].substr(2);
+                //cout <<remainLen<<endl;
+                while(remainLen >0){
+                    int lenCount=0;
+                    int ind_0 = (unsigned char)sVec[i][0] >> 4 ;
+                    int ind_1 = (unsigned char)sVec[i][0] % 16 ;
+                    sVec[i] = sVec[i].substr(1);
+                    remainLen--;
+
+                    int leaf = 0 ;
+                    int cValue = 0;
+                    for(int level=0;level<16;level++){
+                        for(int j=0;j<(unsigned char)sVec[i][level];j++){
+                            data->Huffman[ind_0][ind_1][cValue] =  (unsigned char)sVec[i][16+leaf];
+                            //cout << data->Huffman[ind_0][ind_1][cValue] <<"  "<< (unsigned char)sVec[i][16+leaf]<<endl;
+                            cValue ++;
+                            leaf++;
+                        }
+                        cValue *=2;
+                    }
+                    sVec[i] = sVec[i].substr(16+leaf);
+                    remainLen -= (16+leaf);             
+                }
+            }
+            return ;
         }
-        bool parseSOS(const string &s){
-            return true;
+
+        void parseSOS(const string &s){
+            
+            
+            
+            return ;
         }
+        
         
 };

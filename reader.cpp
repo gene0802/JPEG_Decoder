@@ -50,7 +50,7 @@ class Reader{
                 }else if(last_match == '\xdb'){
                     DQTs.push_back (allText.substr(last_pos+3,n_pos-(last_pos+3)));
                 }else if(last_match == '\xc4'){
-                    DHTs.push_back (allText.substr(last_pos+3,n_pos-(last_pos+3)));
+                    DHTs.push_back (allText.substr(last_pos+2,n_pos-(last_pos+2)));
                 }else if(last_match == '\xda'){
                     SOS = allText.substr(last_pos+3,n_pos-(last_pos+3));
                 }

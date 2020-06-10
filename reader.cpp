@@ -42,8 +42,11 @@ class Reader{
                 found = allText.find("\xff",n_pos+1);
                 n_pos = found;
 
-                if(allText[n_pos+1] == '\x00')
-                    continue;                
+                if(allText[n_pos+1] == '\x00'){
+                    allText.erase(n_pos+1,1);
+                    continue;
+                }
+                                    
 
                 if(last_match == '\xc0'){
                     SOF = allText.substr(last_pos+3,n_pos-(last_pos+3));

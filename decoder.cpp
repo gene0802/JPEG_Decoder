@@ -29,7 +29,7 @@ class Decoder{
             data = d;
         }
 
-        void toRGB(){
+        void toRGB(const char * outfilename){
 
             const vector < vector < YCbCr> > & YUV = data->YUV;
             vector < vector < RGB > > & color = data->color;
@@ -57,21 +57,13 @@ class Decoder{
                     img.set_pixel(i,j,color[j][i].r,color[j][i].g,color[j][i].b); 
                 }
             }
-            img.save_image("./teatime.bmp");
+            img.save_image(outfilename);
         }
         void reSample(){
             vector < vector < YCbCr > > & YUV = data->YUV;
             const vector < vector < Block > > & Y = data->Y;
             const vector < vector < Block > > & Cb = data->Cb;
             const vector < vector < Block > > & Cr = data->Cr;
-
-            float modV_Y = data->Y_inform.sRateV/data->sRateV_Max;
-            float modV_Cb = data->Cb_inform.sRateV/data->sRateV_Max;
-            float modV_Cr = data->Cr_inform.sRateV/data->sRateV_Max;
-
-            float modH_Y = data->Y_inform.sRateH/data->sRateH_Max;
-            float modH_Cb = data->Cb_inform.sRateH/data->sRateH_Max;
-            float modH_Cr = data->Cr_inform.sRateH/data->sRateH_Max;
 
             for(int i=0;i<data->height;i++){
                 int i_Y= i * data->Y_inform.sRateV/data->sRateV_Max;

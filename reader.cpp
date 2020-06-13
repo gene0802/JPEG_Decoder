@@ -20,7 +20,7 @@ class Reader{
         string SOS;
     public:
         Reader(const char* inFile){
-
+            // read file to string
             ifstream fl(inFile);
             fl.seekg( 0, ios::end );  
             size_t len = fl.tellg();  
@@ -32,7 +32,7 @@ class Reader{
         }
 
         void segment(){
-
+            // segment string  
             size_t last_pos = 0;
             size_t n_pos = -1;
             size_t found = 0;
@@ -42,19 +42,18 @@ class Reader{
                 found = allText.find("\xff",n_pos+1);
                 n_pos = found;
 
-                if(allText[n_pos+1] == '\x00'){
+                if(allText[n_pos+1] == '\x00'){  //Not header
                     allText.erase(n_pos+1,1);
                     continue;
                 }
-                                    
 
-                if(last_match == '\xc0'){
+                if(last_match == '\xc0'){  //SOF segment
                     SOF = allText.substr(last_pos+3,n_pos-(last_pos+3));
-                }else if(last_match == '\xdb'){
+                }else if(last_match == '\xdb'){  //DQT segment
                     DQTs.push_back (allText.substr(last_pos+3,n_pos-(last_pos+3)));
-                }else if(last_match == '\xc4'){
+                }else if(last_match == '\xc4'){   //DHT segment
                     DHTs.push_back (allText.substr(last_pos+2,n_pos-(last_pos+2)));
-                }else if(last_match == '\xda'){
+                }else if(last_match == '\xda'){    //SOS segment
                     SOS = allText.substr(last_pos+3,n_pos-(last_pos+3));
                 }
                 last_match = allText[n_pos+1];
@@ -74,13 +73,13 @@ class Reader{
         string getSOS(){
             return SOS;
         }
-        void printByteArray(const char* outFile){
+        // void printByteArray(const char* outFile){
 
-            FILE * ofp = fopen(outFile,"w");
+        //     FILE * ofp = fopen(outFile,"w");
 
-            for(int i=0;i<allText.size();i++)
-                fprintf(ofp,"%2x ", allText[i] & 0xff);
+        //     for(int i=0;i<allText.size();i++)
+        //         fprintf(ofp,"%2x ", allText[i] & 0xff);
             
-            fclose(ofp);
-        }
+        //     fclose(ofp);
+        // }
 };

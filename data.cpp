@@ -40,11 +40,7 @@ class Block{
         short v[8][8]={0}; 
     Block(){};
 };
-class BlockF{
-    public:
-        float v[8][8]={0}; 
-    BlockF(){};
-};
+
 class MCU{
     public:
         vector <Block> Y;
@@ -57,18 +53,7 @@ class MCU{
             Cr.assign(CrNum,Block());
         }
 };
-class MCU_F{
-    public:
-        vector <BlockF> Y;
-        vector <BlockF> Cb;
-        vector <BlockF> Cr;
-        MCU_F(){}
-        MCU_F(int YNum,int CbNum,int CrNum){
-            Y.assign(YNum,BlockF());
-            Cb.assign(CbNum,BlockF());
-            Cr.assign(CrNum,BlockF());
-        }
-};
+
 class Qtable{
     public:
         unsigned char id;

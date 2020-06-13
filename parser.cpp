@@ -17,86 +17,31 @@ const int mask[8] = {128,64,32,16,8,4,2,1};
 class Parser{
     private:
         Data* data;
-        
-        // for scan data usage (pointer to scanned bit)
+
         void parseData(string &s){
-            
-            FILE  * ofp = fopen ("monalisa_data.txt","w");
 
             int row = 1+(data->height - 1)/data->height_MCU;
             int col = 1+(data->width - 1)/data->width_MCU;
 
-            int Y_SRate = data->Y_inform.sRateH * data->Y_inform.sRateV;
-            int Cb_SRate = data->Cb_inform.sRateH * data->Cb_inform.sRateV;
-            int Cr_SRate = data->Cr_inform.sRateH * data->Cr_inform.sRateV;
-
-
             //for MCU i,j
             for (int i=0; i<row;i++){
-                //data->printData("./monalisa_data/monalisa_parse.txt");
                 for (int j=0; j<col;j++){
-                    //cout << "i,j: "<<i<<","<<j<<endl;
                     // Parse  Y
-                    for (int m=0;m<data->Y_inform.sRateV;m++){
-                        for(int n=0;n<data->Y_inform.sRateH;n++){
-                            //cout <<"Y:"<<(data->Y_inform.sRateV*i+m)<<","<<(data->Y_inform.sRateH*j+n)<<endl;
+                    for (int m=0;m<data->Y_inform.sRateV;m++)
+                        for(int n=0;n<data->Y_inform.sRateH;n++)
                             parseBlock(s,data->Huffman[0][data->Y_inform.DHT_ID_DC],data->Huffman[1][data->Y_inform.DHT_ID_AC],data->Y[data->Y_inform.sRateV*i+m][data->Y_inform.sRateH*j+n],0);
-                        }
-                    }
                     //Parse  Cb
-                    for (int m=0;m<data->Cb_inform.sRateV;m++){
-                        for(int n=0;n<data->Cb_inform.sRateH;n++){
-                            //cout <<"Cb:"<<(Cb_SRate*i+m)<<","<<(Cr_SRate*j+n)<<endl;
+                    for (int m=0;m<data->Cb_inform.sRateV;m++)
+                        for(int n=0;n<data->Cb_inform.sRateH;n++)
                             parseBlock(s,data->Huffman[0][data->Cb_inform.DHT_ID_DC],data->Huffman[1][data->Cb_inform.DHT_ID_AC],data->Cb[data->Cb_inform.sRateV*i+m][data->Cb_inform.sRateH*j+n],1);
-                        }
-                    }
+                
                     //Parse Cr
-                    for (int m=0;m<data->Cr_inform.sRateV;m++){
-                        for(int n=0;n<data->Cr_inform.sRateH;n++){
-                            //cout <<"Cr:"<<(Cr_SRate*i+m)<<","<<(Cr_SRate*j+n)<<endl;
+                    for (int m=0;m<data->Cr_inform.sRateV;m++)
+                        for(int n=0;n<data->Cr_inform.sRateH;n++)
                             parseBlock(s,data->Huffman[0][data->Cr_inform.DHT_ID_DC],data->Huffman[1][data->Cr_inform.DHT_ID_AC],data->Cr[data->Cr_inform.sRateV*i+m][data->Cr_inform.sRateH*j+n],2);
-                        }
-                    }
-                    // fprintf(ofp,"MCU (%d,%d) :\n",i,j);
-                    // for (int m=0;m<data->Y_inform.sRateV;m++){
-                    //     for(int n=0;n<data->Y_inform.sRateH;n++){
-                    //         fprintf(ofp,"\t Y (%d,%d) :\n",m,n);
-                    //         for(int k=0;k<8;k++){
-                    //             fprintf(ofp,"\t\t");
-                    //             for(int l=0;l<8;l++){
-                    //                 fprintf(ofp,"%4d ",data->Y[data->Y_inform.sRateV*i+m][data->Y_inform.sRateH*j+n].v[k][l]);
-                    //             }
-                    //             fprintf(ofp,"\n");
-                    //         }
-                    //     }
-                    // }
-                    // for (int m=0;m<data->Cb_inform.sRateV;m++){
-                    //     for(int n=0;n<data->Cb_inform.sRateH;n++){
-                    //         fprintf(ofp,"\t Cb (%d,%d) :\n",m,n);
-                    //         for(int k=0;k<8;k++){
-                    //             fprintf(ofp,"\t\t");
-                    //             for(int l=0;l<8;l++){
-                    //                 fprintf(ofp,"%4d ",data->Cb[data->Cb_inform.sRateV*i+m][data->Cb_inform.sRateH*j+n].v[k][l]);
-                    //             }
-                    //             fprintf(ofp,"\n");
-                    //         }
-                    //     }
-                    // }
-                    // for (int m=0;m<data->Cr_inform.sRateV;m++){
-                    //     for(int n=0;n<data->Cr_inform.sRateH;n++){
-                    //         fprintf(ofp,"\t Cr (%d,%d) :\n",m,n);
-                    //         for(int k=0;k<8;k++){
-                    //             fprintf(ofp,"\t\t");
-                    //             for(int l=0;l<8;l++){
-                    //                 fprintf(ofp,"%4d ",data->Cr[data->Cr_inform.sRateV*i+m][data->Cr_inform.sRateH*j+n].v[k][l]);
-                    //             }
-                    //             fprintf(ofp,"\n");
-                    //         }
-                    //     }
-                    // }
+    
                 }
             }
-            //cout <<"here\n";
             return;
         }
         void parseBlock(string &s, unordered_map<string ,int>&hDC,unordered_map<string ,int>&hAC,Block &b, int type){
@@ -115,14 +60,12 @@ class Parser{
             }while(hDC.count(codeH)==0);
 
             T = hDC[codeH];
-            //cout << "\tT:"<< T << "codeH:" << codeH<<endl;
             //(2)find diff
             for(int i=0;i<T;i++)
                 diff = (diff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc++%8]);
 
             diff = (diff >= (1<<T-1)) ? diff : diff+1-(1<<T); 
-            //cout << "\tdiff:"<< diff<<endl;
-            //b.v[0][0] = diff;
+
             if (type == 0){
                 b.v[0][0] = diff +preY_DC;
                 preY_DC = b.v[0][0];
@@ -133,7 +76,6 @@ class Parser{
                 b.v[0][0] = diff + preCr_DC;
                 preCr_DC = b.v[0][0];
             }
-            //cout << "\there!!:"<<endl;
 
         //2.get AC 63 coff
             int coffIdx=1;
@@ -144,14 +86,12 @@ class Parser{
                 
                 codeH.clear();
                 do{ 
-                        //cout << "here1"<<endl;
                     codeH = codeH + (((bool) (s[bitLoc>>3] & mask[bitLoc++%8]))? "1":"0");
 
                 }while(hAC.count( codeH )==0);
-                //cout << "\tT:"<< T<<endl;
+
                 T = hAC[codeH];
 
-                //cout << "\tT:"<< T << "codeH:" << codeH<<endl;
             //(2)find coeff
                 if (T == 0x00)  //0x00 means left AC coff are all zero 
                      break;
@@ -177,19 +117,20 @@ class Parser{
             data = d;
         }
         void parseSOF(const string &s){
+            //set image size
             data-> height = (unsigned char)s[2]<<8 |(unsigned char) s[3];
             data-> width  = (unsigned char)s[4]<<8 |(unsigned char) s[5];
-            
+            //set Channel Y information
             data-> Y_inform.id = s[7];
             data-> Y_inform.sRateH =(unsigned char)s[8]>>4;
             data-> Y_inform.sRateV =(unsigned char)s[8]%16;
             data-> Y_inform.DQT_ID = s[9];
-
+            //set Channel Cb information
             data-> Cb_inform.id = s[10];
             data-> Cb_inform.sRateH =(unsigned char)s[11]>>4;
             data-> Cb_inform.sRateV =(unsigned char)s[11]%16;
             data-> Cb_inform.DQT_ID = s[12];
-
+            //set Channel Cr information
             data-> Cr_inform.id = s[13];
             data-> Cr_inform.sRateH =(unsigned char)s[14]>>4;
             data-> Cr_inform.sRateV =(unsigned char)s[14]%16;
@@ -204,13 +145,7 @@ class Parser{
             data-> width_MCU = 8*sRateH_Max;
             data-> sRateH_Max = sRateH_Max;
             data-> sRateV_Max = sRateV_Max;
-
-            //allocate Data memory
-            // int row_MCU = (1+(data->height - 1)/data->height_MCU);
-            // int col_MCU = (1+(data->width - 1)/data->width_MCU);
-            // int YNum = data->Y_inform.sRateH * data->Y_inform.sRateV;
-            // int CbNum= data->Cb_inform.sRateH * data->Cb_inform.sRateV;
-            // int CrNum = data->Cr_inform.sRateH * data->Cr_inform.sRateV;
+            // allocate Y,Cb,Cr memory 
             int row = 1+(data->height - 1)/data->height_MCU;
             int col = 1+(data->width - 1)/data->width_MCU;
             data->Y.assign (row * (data->Y_inform.sRateV),vector<Block>(col* data->Y_inform.sRateH));
@@ -218,9 +153,7 @@ class Parser{
             data->Cr.assign (row * (data->Cr_inform.sRateV),vector<Block>(col* data->Cr_inform.sRateH));
             data->color.assign(data->height,vector<RGB>(data->width));
             data->YUV.assign(data->height,vector<YCbCr>(data->width));
-            //data->mcu.assign(row_MCU, vector<MCU>(col_MCU,MCU(YNum,CbNum,CrNum)));
 
-            //data->mcu_f.assign(row_MCU, vector<MCU_F>(col_MCU,MCU_F(YNum,CbNum,CrNum)));
             return ;
         }
         void parseDQT(const vector <string> & sV){
@@ -265,10 +198,9 @@ class Parser{
             
             for(int i=0;i<sVec.size();i++)
             {   
-                //cout << (( (unsigned char) sVec[i][0])<<8) <<","<<(int)(unsigned char)sVec[i][1]<<endl;
                 int remainLen = (int)(((unsigned char)sVec[i][0])<<8) + (int)((unsigned char)sVec[i][1])-2;
                 sVec[i] = sVec[i].substr(2);
-                //cout <<remainLen<<endl;
+
                 while(remainLen >0){
                     int lenCount=0;
                     int ind_0 = (unsigned char)sVec[i][0] >> 4 ;
@@ -284,8 +216,6 @@ class Parser{
                             string code = bitset<16>((unsigned long long)cValue).to_string();
                             code =  code.substr(16-(level+1));
                             data->Huffman[ind_0][ind_1][code] =  (unsigned char)sVec[i][16+leaf];
-                        
-                            //cout << data->Huffman[ind_0][ind_1][cValue] <<"  "<< (unsigned char)sVec[i][16+leaf]<<endl;
                             cValue ++;
                             leaf++;
                         }

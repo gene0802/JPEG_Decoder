@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int main(){
+int main(int argc,char* argv[]){
     // for(int l=0,x=l*2+1; l<8; l++,x+=2){
     //     for(int k=0,y=l*2+1; k<8; k++,x+=2)
     //         for(int u=0;u<8;u++)
@@ -16,7 +16,12 @@ int main(){
     // for(int l=0,x=l*2+1; l<8; l++,x+=2){
     //         printf("{");
     //         for(int u=0;u<8;u++){
-    //                 printf("%.10f,",cos(x*u*M_PI/16.0));
+    //             if (l==0 && u==0)
+    //                 printf("%.10f,",cos(x*u*M_PI/16.0)*0.5);
+    //             else if (l==0)
+    //                 printf("%.10f,",(cos(x*u*M_PI/16.0)*0.7071067811865476));
+    //             else 
+    //                  printf("%.10f,",cos(x*u*M_PI/16.0));
     //         }
     //         printf("}\n");
     // }
@@ -26,7 +31,7 @@ int main(){
     double cpu_time_used;
 
     Data data ;
-    Reader* reader = new Reader("./2020_JPEG/teatime.jpg");
+    Reader* reader = new Reader(argv[1]);
     //Reader* reader = new Reader("./2020_JPEG/monalisa.jpg");
     Parser parser(&data);
     Decoder decoder(&data);
@@ -44,17 +49,21 @@ int main(){
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf(" parser1   time :%f\n",cpu_time_used);
 
+    
+
     start = clock();
     parser.parseSOS(reader->getSOS());
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf(" parser2   time :%f\n",cpu_time_used);
 
+
     start = clock();
     decoder.invQuantize();
     end = clock();
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf(" invQ   time :%f\n",cpu_time_used);
+
 
     start = clock();
     decoder.invZigZag();

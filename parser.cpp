@@ -21,6 +21,8 @@ class Parser{
         // for scan data usage (pointer to scanned bit)
         void parseData(string &s){
             
+            FILE  * ofp = fopen ("monalisa_data.txt","w");
+
             int row = 1+(data->height - 1)/data->height_MCU;
             int col = 1+(data->width - 1)/data->width_MCU;
 
@@ -31,12 +33,13 @@ class Parser{
 
             //for MCU i,j
             for (int i=0; i<row;i++){
+                //data->printData("./monalisa_data/monalisa_parse.txt");
                 for (int j=0; j<col;j++){
+                    //cout << "i,j: "<<i<<","<<j<<endl;
                     // Parse  Y
-                    
                     for (int m=0;m<data->Y_inform.sRateV;m++){
                         for(int n=0;n<data->Y_inform.sRateH;n++){
-                            //cout <<"Y:"<<(data->Y_inform.sRateH*i+m)<<","<<(data->Y_inform.sRateV*j+n)<<endl;
+                            //cout <<"Y:"<<(data->Y_inform.sRateV*i+m)<<","<<(data->Y_inform.sRateH*j+n)<<endl;
                             parseBlock(s,data->Huffman[0][data->Y_inform.DHT_ID_DC],data->Huffman[1][data->Y_inform.DHT_ID_AC],data->Y[data->Y_inform.sRateV*i+m][data->Y_inform.sRateH*j+n],0);
                         }
                     }
@@ -54,6 +57,43 @@ class Parser{
                             parseBlock(s,data->Huffman[0][data->Cr_inform.DHT_ID_DC],data->Huffman[1][data->Cr_inform.DHT_ID_AC],data->Cr[data->Cr_inform.sRateV*i+m][data->Cr_inform.sRateH*j+n],2);
                         }
                     }
+                    // fprintf(ofp,"MCU (%d,%d) :\n",i,j);
+                    // for (int m=0;m<data->Y_inform.sRateV;m++){
+                    //     for(int n=0;n<data->Y_inform.sRateH;n++){
+                    //         fprintf(ofp,"\t Y (%d,%d) :\n",m,n);
+                    //         for(int k=0;k<8;k++){
+                    //             fprintf(ofp,"\t\t");
+                    //             for(int l=0;l<8;l++){
+                    //                 fprintf(ofp,"%4d ",data->Y[data->Y_inform.sRateV*i+m][data->Y_inform.sRateH*j+n].v[k][l]);
+                    //             }
+                    //             fprintf(ofp,"\n");
+                    //         }
+                    //     }
+                    // }
+                    // for (int m=0;m<data->Cb_inform.sRateV;m++){
+                    //     for(int n=0;n<data->Cb_inform.sRateH;n++){
+                    //         fprintf(ofp,"\t Cb (%d,%d) :\n",m,n);
+                    //         for(int k=0;k<8;k++){
+                    //             fprintf(ofp,"\t\t");
+                    //             for(int l=0;l<8;l++){
+                    //                 fprintf(ofp,"%4d ",data->Cb[data->Cb_inform.sRateV*i+m][data->Cb_inform.sRateH*j+n].v[k][l]);
+                    //             }
+                    //             fprintf(ofp,"\n");
+                    //         }
+                    //     }
+                    // }
+                    // for (int m=0;m<data->Cr_inform.sRateV;m++){
+                    //     for(int n=0;n<data->Cr_inform.sRateH;n++){
+                    //         fprintf(ofp,"\t Cr (%d,%d) :\n",m,n);
+                    //         for(int k=0;k<8;k++){
+                    //             fprintf(ofp,"\t\t");
+                    //             for(int l=0;l<8;l++){
+                    //                 fprintf(ofp,"%4d ",data->Cr[data->Cr_inform.sRateV*i+m][data->Cr_inform.sRateH*j+n].v[k][l]);
+                    //             }
+                    //             fprintf(ofp,"\n");
+                    //         }
+                    //     }
+                    // }
                 }
             }
             //cout <<"here\n";
@@ -75,12 +115,13 @@ class Parser{
             }while(hDC.count(codeH)==0);
 
             T = hDC[codeH];
-
+            //cout << "\tT:"<< T << "codeH:" << codeH<<endl;
             //(2)find diff
             for(int i=0;i<T;i++)
                 diff = (diff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc++%8]);
 
             diff = (diff >= (1<<T-1)) ? diff : diff+1-(1<<T); 
+            //cout << "\tdiff:"<< diff<<endl;
             //b.v[0][0] = diff;
             if (type == 0){
                 b.v[0][0] = diff +preY_DC;
@@ -92,7 +133,7 @@ class Parser{
                 b.v[0][0] = diff + preCr_DC;
                 preCr_DC = b.v[0][0];
             }
-            
+            //cout << "\there!!:"<<endl;
 
         //2.get AC 63 coff
             int coffIdx=1;
@@ -102,12 +143,15 @@ class Parser{
                 coff = 0;
                 
                 codeH.clear();
-                do{    
+                do{ 
+                        //cout << "here1"<<endl;
                     codeH = codeH + (((bool) (s[bitLoc>>3] & mask[bitLoc++%8]))? "1":"0");
-                }while(hAC.count( codeH )==0);
 
+                }while(hAC.count( codeH )==0);
+                //cout << "\tT:"<< T<<endl;
                 T = hAC[codeH];
 
+                //cout << "\tT:"<< T << "codeH:" << codeH<<endl;
             //(2)find coeff
                 if (T == 0x00)  //0x00 means left AC coff are all zero 
                      break;
@@ -121,7 +165,6 @@ class Parser{
                 int lowT = T & 0x0F;           
                 for(int i=0;i<lowT;i++)
                     coff =  (coff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc++%8]);
-
                 b.v[coffIdx/8][coffIdx%8] = (coff >= (1<<lowT-1)) ? coff : coff+1-(1<<lowT); 
                 
                 coffIdx++;
@@ -168,10 +211,11 @@ class Parser{
             // int YNum = data->Y_inform.sRateH * data->Y_inform.sRateV;
             // int CbNum= data->Cb_inform.sRateH * data->Cb_inform.sRateV;
             // int CrNum = data->Cr_inform.sRateH * data->Cr_inform.sRateV;
-           
-            data->Y.assign (data->height/(8*sRateV_Max/data->Y_inform.sRateV),vector<Block>(data->width/(8*sRateH_Max/data->Y_inform.sRateH)));
-            data->Cb.assign (data->height/(8*sRateV_Max/data->Cb_inform.sRateV),vector<Block>(data->width/(8*sRateH_Max/data->Cb_inform.sRateH)));
-            data->Cr.assign (data->height/(8*sRateV_Max/data->Cr_inform.sRateV),vector<Block>(data->width/(8*sRateH_Max/data->Cr_inform.sRateH)));
+            int row = 1+(data->height - 1)/data->height_MCU;
+            int col = 1+(data->width - 1)/data->width_MCU;
+            data->Y.assign (row * (data->Y_inform.sRateV),vector<Block>(col* data->Y_inform.sRateH));
+            data->Cb.assign (row * (data->Cb_inform.sRateV),vector<Block>(col* data->Cb_inform.sRateH));
+            data->Cr.assign (row * (data->Cr_inform.sRateV),vector<Block>(col* data->Cr_inform.sRateH));
             data->color.assign(data->height,vector<RGB>(data->width));
             data->YUV.assign(data->height,vector<YCbCr>(data->width));
             //data->mcu.assign(row_MCU, vector<MCU>(col_MCU,MCU(YNum,CbNum,CrNum)));
@@ -255,7 +299,7 @@ class Parser{
         }
 
         void parseSOS(const string &s){
-        
+
             data->Y_inform.DHT_ID_DC = (unsigned char)s[3]>>4;
             data->Y_inform.DHT_ID_AC= (unsigned char)s[3]%16;
             data->Cb_inform.DHT_ID_DC = (unsigned char)s[5]>>4;
@@ -264,7 +308,6 @@ class Parser{
             data->Cr_inform.DHT_ID_AC = (unsigned char)s[7]%16;
 
             string dataS = s.substr(11);
-
 
             parseData(dataS);
 

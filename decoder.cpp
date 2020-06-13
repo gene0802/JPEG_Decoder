@@ -30,18 +30,10 @@ class Decoder{
         }
 
         void toRGB(){
-            //vector < vector < RGB > > & color = data->color;
+
             const vector < vector < YCbCr> > & YUV = data->YUV;
             vector < vector < RGB > > & color = data->color;
 
-
-            // for(int i=0;i<data->height;i++){
-            //     for(int j=0;j<data->width;j++){
-            //         color[i][j].r = YUV[i][j].r + 1.402* YUV[i][j].b;
-            //         color[i][j].g = YUV[i][j].r - 0.34414* YUV[i][j].g - 0.71414*YUV[i][j].b;
-            //         color[i][j].b = YUV[i][j].r + 1.772* YUV[i][j].g;
-            //     }
-            // }
             bitmap_image img(data->width,data->height);
             int r,g,b;
             for(int i=0;i<data->height;i++){
@@ -99,15 +91,6 @@ class Decoder{
         }
         void invDCT(){
 
-            // int row_MCU = (1+(data->height - 1)/data->height_MCU);
-            // int col_MCU = (1+(data->width - 1)/data->width_MCU);
-            // int YNum = data->Y_inform.sRateH * data->Y_inform.sRateV;
-            // int CbNum= data->Cb_inform.sRateH * data->Cb_inform.sRateV;
-            // int CrNum = data->Cr_inform.sRateH * data->Cr_inform.sRateV;
-
-            
-            // int row = 1+(data->height - 1)/data->height_MCU;
-            // int col = 1+(data->width - 1)/data->width_MCU;
             Block newB;
             int Y_row = data->Y.size();
             int Y_col = data->Y[0].size();
@@ -196,109 +179,15 @@ class Decoder{
                     *b = newB;
                 }
                 
-                
-            // for (int i=0; i<row;i++){
-            //     for (int j=0; j<col;j++){
-            //         // Parse all Y
-            //         for (int m=0;m<data->Y_inform.sRateV;m++)
-            //             for(int n=0;n<data->Y_inform.sRateH;n++){
-
-            //                 Block *b = &data->Y[data->Y_inform.sRateV*i+m][data->Y_inform.sRateH*j+n];
-
-            //                 for(int l=0,x=l*2+1; l<8; l++,x+=2){
-            //                     for(int k=0,y=k*2+1; k<8; k++,y+=2){
-            //                         float sum = 0.0;
-            //                         // DC term
-            //                             sum += 0.5f * (*b).v[0][0] ;
-            //                         // first row term
-            //                         for(int v=1;v<8;v++)
-            //                             sum += squ2_1* (*b).v[0][v] * cos(y*v*M_PI/16.0f);
-            //                         // fisrt col term
-            //                          for(int u=1;u<8;u++)
-            //                            sum += squ2_1* (*b).v[u][0] * cos(x*u*M_PI/16.0f);
-            //                         // left term
-            //                         for(int u=1;u<8;u++)
-            //                             for(int v=1;v<8;v++)
-            //                                sum += (*b).v[u][v] * cos(x*u*M_PI/16.0f)* cos(y*v*M_PI/16.0f);
-            //                         newB.v[l][k] = (short)round(0.25*sum);
-            //                     }
-            //                 }
-            //                 *b = newB;
-            //             }
-            //         //Parse all Cb
-            //         for (int m=0;m<data->Cb_inform.sRateV;m++)
-            //             for(int n=0;n<data->Cb_inform.sRateH;n++){
-
-            //                 Block *b = &data->Cb[data->Cb_inform.sRateV*i+m][data->Cb_inform.sRateH*j+n];
-
-            //                 for(int l=0,x=l*2+1; l<8; l++,x+=2){
-            //                     for(int k=0,y=k*2+1; k<8; k++,y+=2){
-            //                         float sum = 0.0;
-            //                         // DC term
-            //                             sum += 0.5f * (*b).v[0][0] ;
-            //                         // first row term
-            //                         for(int v=1;v<8;v++)
-            //                             sum +=  squ2_1* (*b).v[0][v] * cos(M_PI*y*v/16.0);
-            //                         // fisrt col term
-            //                         for(int u=1;u<8;u++)
-            //                            sum +=   squ2_1* (*b).v[u][0] * cos(M_PI*x*u/16.0);
-            //                         // left term
-            //                         for(int u=1;u<8;u++)
-            //                             for(int v=1;v<8;v++){
-            //                                sum +=  (*b).v[u][v] * cos(x*u*M_PI/16.0)* cos(y*v*M_PI/16.0);
-            //                             }
-            //                         newB.v[l][k] = (short)round(0.25*sum);
-            //                     }
-            //                 }
-            //                 *b = newB;
-            //             }
-            //         //Parse all Cr
-            //         for (int m=0;m<data->Cr_inform.sRateV;m++)
-            //             for(int n=0;n<data->Cr_inform.sRateH;n++){
-
-            //                 Block *b = &data->Cr[data->Cr_inform.sRateV*i+m][data->Cr_inform.sRateH*j+n];
-
-            //                 for(int l=0,x=l*2+1; l<8; l++,x+=2){
-            //                     for(int k=0,y=k*2+1; k<8; k++,y+=2){
-            //                         float sum = 0.0;
-            //                         // DC term
-            //                             sum += 0.5f * (*b).v[0][0] ;
-            //                         // first row term
-            //                         for(int v=1;v<8;v++)
-            //                             sum += squ2_1* (*b).v[0][v] * cos(M_PI*y*v/16.0f);
-            //                         // fisrt col term
-            //                          for(int u=1;u<8;u++)
-            //                            sum += squ2_1* (*b).v[u][0] * cos(M_PI*x*u/16.0f);
-            //                         // left term
-            //                         for(int u=1;u<8;u++)
-            //                             for(int v=1;v<8;v++)
-            //                                sum += (*b).v[u][v] * cos(M_PI*x*u/16.0f)* cos(M_PI*y*v/16.0f);
-            //                         newB.v[l][k] =(short)round(0.25*sum);
-            //                     }
-            //                 }
-            //                 *b = newB;
-            //             }
-            //     }
-                
-            // }
-
         }
         void invZigZag(){
 
-            int row_MCU = (1+(data->height - 1)/data->height_MCU);
-            int col_MCU = (1+(data->width - 1)/data->width_MCU);
-            int YNum = data->Y_inform.sRateH * data->Y_inform.sRateV;
-            int CbNum = data->Cb_inform.sRateH * data->Cb_inform.sRateV;
-            int CrNum = data->Cr_inform.sRateH * data->Cr_inform.sRateV;
-            //data->mcu.assign(row_MCU, vector<MCU>(col_MCU,MCU(YNum,CbNum,CrNum)));
-            //vector <vector <MCU>> mcu_new(row_MCU, vector<MCU>(col_MCU,MCU(YNum,CbNum,CrNum)));
-            vector <vector <Block>> newY(data->height/(8*data->sRateV_Max/data->Y_inform.sRateV),vector<Block>(data->width/(8*data->sRateH_Max/data->Y_inform.sRateH)));
-            vector <vector <Block>> newCb(data->height/(8*data->sRateV_Max/data->Cb_inform.sRateV),vector<Block>(data->width/(8*data->sRateH_Max/data->Cb_inform.sRateH)));
-            vector <vector <Block>> newCr(data->height/(8*data->sRateV_Max/data->Cr_inform.sRateV),vector<Block>(data->width/(8*data->sRateH_Max/data->Cr_inform.sRateH)));
-            //data->Cb.assign (data->height/(8*sRateH_Max/data->Cb_inform.sRateH),vector<Block>(data->height/(8*sRateH_Max/data->Cb_inform.sRateH)));
-            //data->Cr.assign (data->height/(8*sRateH_Max/data->Cr_inform.sRateH),vector<Block>(data->height/(8*sRateH_Max/data->Cr_inform.sRateH)));
             int row = 1+(data->height - 1)/data->height_MCU;
             int col = 1+(data->width - 1)/data->width_MCU;
+
+            vector <vector <Block>> newY(row * (data->Y_inform.sRateV),vector<Block>(col* data->Y_inform.sRateH));
+            vector <vector <Block>> newCb(row * (data->Cb_inform.sRateV),vector<Block>(col* data->Cb_inform.sRateH));
+            vector <vector <Block>> newCr(row * (data->Cr_inform.sRateV),vector<Block>(col* data->Cr_inform.sRateH));
 
                 for (int i=0; i<row;i++){
                     for (int j=0; j<col;j++){

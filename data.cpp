@@ -193,21 +193,21 @@ class Data{
                     }
                 }
             }
-            fprintf(ofp,"\nYUV  :\n");
-            for(int i=0;i<height;i++){
-                fprintf(ofp,"\t height:%d \n",i);
-                for(int j=0;j<width;j++){
-                    fprintf(ofp,"%3d,%3d:(%3d,%3d,%3d):\n",i,j,YUV[i][j].r,YUV[i][j].g,YUV[i][j].b);
-                }
-            }
+            // fprintf(ofp,"\nYUV  :\n");
+            // for(int i=0;i<height;i++){
+            //     fprintf(ofp,"\t height:%d \n",i);
+            //     for(int j=0;j<width;j++){
+            //         fprintf(ofp,"%3d,%3d:(%3d,%3d,%3d):\n",i,j,YUV[i][j].r,YUV[i][j].g,YUV[i][j].b);
+            //     }
+            // }
 
-            fprintf(ofp,"\nRGB  :\n");
-            for(int i=0;i<height;i++){
-                fprintf(ofp,"\t height:%d \n",i);
-                for(int j=0;j<width;j++){
-                    fprintf(ofp,"%3d,%3d:(%d,%d,%d) :\n",i,j,color[i][j].r,color[i][j].g,color[i][j].b);
-                }
-            }
+            // fprintf(ofp,"\nRGB  :\n");
+            // for(int i=0;i<height;i++){
+            //     fprintf(ofp,"\t height:%d \n",i);
+            //     for(int j=0;j<width;j++){
+            //         fprintf(ofp,"%3d,%3d:(%d,%d,%d) :\n",i,j,color[i][j].r,color[i][j].g,color[i][j].b);
+            //     }
+            // }
           
             fclose(ofp);
         }

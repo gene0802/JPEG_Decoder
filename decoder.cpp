@@ -1,6 +1,5 @@
 # include "data.cpp"
 # include "bitmap_image.hpp"
-# define M_PI 3.14159265358979323846
 # define squ2_1 0.7071067811865476f
 const size_t z[8][8]={
     { 0,  1,  5,  6, 14, 15, 27, 28},
@@ -177,9 +176,9 @@ class Decoder{
             int row = 1+(data->height - 1)/data->height_MCU;
             int col = 1+(data->width - 1)/data->width_MCU;
 
-            vector <vector <Block>> newY(row * (data->Y_inform.sRateV),vector<Block>(col* data->Y_inform.sRateH));
-            vector <vector <Block>> newCb(row * (data->Cb_inform.sRateV),vector<Block>(col* data->Cb_inform.sRateH));
-            vector <vector <Block>> newCr(row * (data->Cr_inform.sRateV),vector<Block>(col* data->Cr_inform.sRateH));
+            vector <vector <Block> > newY(row * (data->Y_inform.sRateV),vector<Block>(col* data->Y_inform.sRateH));
+            vector <vector <Block> > newCb(row * (data->Cb_inform.sRateV),vector<Block>(col* data->Cb_inform.sRateH));
+            vector <vector <Block> > newCr(row * (data->Cr_inform.sRateV),vector<Block>(col* data->Cr_inform.sRateH));
 
                 for (int i=0; i<row;i++){
                     for (int j=0; j<col;j++){

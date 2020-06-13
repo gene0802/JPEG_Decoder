@@ -56,15 +56,17 @@ class Parser{
             string codeH;
 
             do{
-                codeH = codeH + (((bool) (s[bitLoc>>3] & mask[bitLoc++%8]))? "1":"0");
+                codeH = codeH + (((bool) (s[bitLoc>>3] & mask[bitLoc%8]))? "1":"0");
+                bitLoc++;
             }while(hDC.count(codeH)==0);
 
             T = hDC[codeH];
             //(2)find diff
-            for(int i=0;i<T;i++)
-                diff = (diff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc++%8]);
-
-            diff = (diff >= (1<<T-1)) ? diff : diff+1-(1<<T); 
+            for(int i=0;i<T;i++){
+                diff = (diff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc%8]);
+                bitLoc++;
+            }
+            diff = (diff >= (1<<(T-1))) ? diff : diff+1-(1<<T); 
 
             if (type == 0){
                 b.v[0][0] = diff +preY_DC;
@@ -86,8 +88,8 @@ class Parser{
                 
                 codeH.clear();
                 do{ 
-                    codeH = codeH + (((bool) (s[bitLoc>>3] & mask[bitLoc++%8]))? "1":"0");
-
+                    codeH = codeH + (((bool) (s[bitLoc>>3] & mask[bitLoc%8]))? "1":"0");
+                    bitLoc++;
                 }while(hAC.count( codeH )==0);
 
                 T = hAC[codeH];
@@ -103,9 +105,11 @@ class Parser{
                 coff = 0;
                 coffIdx += (T >>4);  
                 int lowT = T & 0x0F;           
-                for(int i=0;i<lowT;i++)
-                    coff =  (coff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc++%8]);
-                b.v[coffIdx/8][coffIdx%8] = (coff >= (1<<lowT-1)) ? coff : coff+1-(1<<lowT); 
+                for(int i=0;i<lowT;i++){
+                    coff =  (coff << 1) + (bool) (s[bitLoc>>3] & mask[bitLoc%8]);
+                    bitLoc++;
+                }
+                b.v[coffIdx/8][coffIdx%8] = (coff >= (1<<(lowT-1))) ? coff : coff+1-(1<<lowT); 
                 
                 coffIdx++;
             }
@@ -180,7 +184,7 @@ class Parser{
                     }else{
                         for(int j=0;j<8;j++)
                             for (int k=0;k<8;k++){
-                                qT.v[j][k] = (unsigned int)sVec[i][1+(j*8+k)*2] <<4 + (unsigned int)sVec[i][1+(j*8+k)*2+1];
+                                qT.v[j][k] = ((unsigned int)sVec[i][1+(j*8+k)*2] << 4) + (unsigned int)sVec[i][1+(j*8+k)*2+1];
                                 lenCount+=2;
                             }
                     }
